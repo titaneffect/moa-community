@@ -81,6 +81,8 @@ jobs:
         script: |
           set -e
           
+          command -v curl >/dev/null  # 기존 컨테이너를 중지하기 전에 확인 도구가 있는지 검사
+          
           docker pull "$IMAGE"
 
           docker stop deepstudy || true
@@ -95,3 +97,25 @@ jobs:
             -e DB_PASSWORD \
             -v /home/ubuntu/deepstudy-uploads:/data/uploads \
             "$IMAGE"
+            
+          # Tomcat과 애플리케이션 기동을 기다리면서 확인
+          for attempt in $(seq 1 30); do
+            if status=$(curl --silent --show-error \
+              --connect-timeout 2 \
+              --max-time 5 \
+              --output /dev/null \
+              --write-out '%{http_code}' \
+              http://127.0.0.1:8080/cafe); then
+              
+              if [ "$status" = "200" ]; then
+                echo "배포 확인 성공: /cafe HTTP 200"
+                exit 0
+              fi
+            fi
+            
+            echo "애플리케이션 기동 대기: $attempt/30"
+            sleep 3
+          done
+          
+          echo "배포 확인 실패: /cafe 정상 응답 없음"
+          exit 1
