@@ -3,11 +3,11 @@ name: 모두의 카페 커뮤니티에 GitHub Actions 기반 CI/CD 파이프라�
 on:
   push:
     branches:
-      - main      # 주석 : main 브랜치에 push가 되면 actions가 동작함
+      - main  # 주석 : main 브랜치에 push가 되면 actions가 동작함
 
 #환경변수
 env:
-  SERVER_IP: 52.78.228.162
+  SERVER_IP: ${{vars.SERVER_IP}}
 
 jobs:
   build:
@@ -69,10 +69,10 @@ jobs:
     - name: Deploy to EC2
       uses: appleboy/ssh-action@v1.2.5
       env:
-        DB_URL: ${{ secrets.DB_URL }}
-        DB_USERNAME: ${{ secrets.DB_USERNAME }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/deepstudy:latest
+        DB_URL: ${{secrets.DB_URL}}
+        DB_USERNAME: ${{secrets.DB_USERNAME}}
+        DB_PASSWORD: ${{secrets.DB_PASSWORD}}
+        IMAGE: ${{secrets.DOCKERHUB_USERNAME}}/deepstudy:latest
       with:
         host: ${{env.SERVER_IP}}
         username: ubuntu
