@@ -120,36 +120,12 @@
 	
 	                <div class="cafe-attachment-item">
 	
-	                    <c:choose>
-	
-	                        <c:when test="${fn:startsWith(
-	                                attach.contentType,
-	                                'image/')}">
-	
-	                            <a href="${pageContext.request.contextPath}/attachments/${attach.ano}/view"
-	                               target="_blank">
-	
-	                                <img class="attachment-image"
-	                                     src="${pageContext.request.contextPath}/attachments/${attach.ano}/view"
-	                                     alt="${fn:escapeXml(attach.fileName)}">
-	
-	                            </a>
-	
-	                        </c:when>
-	
-	                        <c:otherwise>
-	
-	                            <div class="cafe-file-placeholder">
-	                                FILE
-	                            </div>
-	
-	                        </c:otherwise>
-	
-	                    </c:choose>
+	                    <div class="cafe-file-placeholder">
+						    FILE
+						</div>
 	
 	                    <a class="cafe-attachment-name"
-	                       href="${pageContext.request.contextPath}/attachments/${attach.ano}/view"
-	                       target="_blank">
+	                       href="${pageContext.request.contextPath}/attachments/${attach.ano}/view">
 	                        <c:out value="${attach.fileName}"/>
 	                    </a>
 	

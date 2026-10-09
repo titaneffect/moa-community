@@ -110,26 +110,9 @@
                         <div class="existing-attach cafe-existing-attachment"
                              data-ano="${attach.ano}">
 
-                            <c:choose>
-
-                                <c:when test="${fn:startsWith(
-                                        attach.contentType,
-                                        'image/')}">
-
-                                    <img src="${pageContext.request.contextPath}/attachments/${attach.ano}/view"
-                                         alt="${fn:escapeXml(attach.fileName)}">
-
-                                </c:when>
-
-                                <c:otherwise>
-
-                                    <div class="cafe-file-placeholder">
-                                        FILE
-                                    </div>
-
-                                </c:otherwise>
-
-                            </c:choose>
+                            <div class="cafe-file-placeholder">
+							    FILE
+							</div>
 
                             <span class="cafe-existing-file-name">
                                 <c:out value="${attach.fileName}"/>
