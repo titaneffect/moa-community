@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+    "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+    "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+
+    <!-- 게시판 공통 틀 -->
+    <definition name="boardLayout"
+                template="/WEB-INF/views/layout/boardLayout.jsp">
+        <put-attribute name="title" value="게시판" type="string"/>
+        <put-attribute name="styles"
+                       value="/WEB-INF/views/common/styles.jsp"/>
+        <put-attribute name="header"
+                       value="/WEB-INF/views/common/header.jsp"/>
+        <put-attribute name="banner"
+                       value="/WEB-INF/views/common/cafeBanner.jsp"/>
+        <put-attribute name="sidebar"
+                       value="/WEB-INF/views/common/cafeSidebar.jsp"/>
+    </definition>
+
+    <!-- 공통 틀을 상속하고, 목록 화면의 본문을 지정 -->
+    <definition name="board/*" extends="boardLayout">
+        <put-attribute name="body"
+                       value="/WEB-INF/views/board/{1}.jsp"/>
+    </definition>
+
+</tiles-definitions>

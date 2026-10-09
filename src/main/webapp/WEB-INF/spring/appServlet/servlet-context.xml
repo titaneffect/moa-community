@@ -15,8 +15,26 @@
 	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
 	<resources mapping="/resources/**" location="/resources/" />
 
+	<!-- Tiles 화면 정의 파일을 읽음 -->
+	<beans:bean id="tilesConfigurer"
+	    class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
+	    <beans:property name="definitions">
+	        <beans:list>
+	            <beans:value>/WEB-INF/tiles/tiles.xml</beans:value>
+	        </beans:list>
+	    </beans:property>
+	</beans:bean>
+	
+	<!-- 우선 board/list만 Tiles로 처리 -->
+	<beans:bean
+	    class="org.springframework.web.servlet.view.tiles3.TilesViewResolver">
+	    <beans:property name="order" value="0"/>
+	    <beans:property name="viewNames" value="board/*"/>
+	</beans:bean>
+
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="order" value="1"/>
 		<beans:property name="prefix" value="/WEB-INF/views/" />
 		<beans:property name="suffix" value=".jsp" />
 	</beans:bean>
