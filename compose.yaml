@@ -1,0 +1,29 @@
+name: deepstudy-deploy
+
+services:
+  nginx:
+    image: nginx:stable
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./deploy/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certbot/www:/var/www/certbot:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+
+  app:
+    image: yongjin98/deepstudy:latest
+    container_name: deepstudy
+    restart: unless-stopped
+    network_mode: host
+    env_file:
+      - path: ./app.env
+        format: raw
+    volumes:
+      - /home/ubuntu/deepstudy-uploads:/data/uploads
+      - ./deploy/tomcat/ROOT.xml:/usr/local/tomcat/conf/Catalina/localhost/ROOT.xml:ro
+

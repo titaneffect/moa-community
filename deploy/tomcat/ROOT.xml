@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+    <!-- Current EC2 Nginx IP. Recheck this address after recreating its network. -->
+    <Valve className="org.apache.catalina.valves.RemoteIpValve"
+           internalProxies="172[.]19[.]0[.]2"
+           remoteIpHeader="X-Forwarded-For"
+           protocolHeader="X-Forwarded-Proto"
+           protocolHeaderHttpsValue="https"
+           httpsServerPort="443" />
+</Context>
