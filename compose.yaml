@@ -27,3 +27,22 @@ services:
       - /home/ubuntu/deepstudy-uploads:/data/uploads
       - ./deploy/tomcat/ROOT.xml:/usr/local/tomcat/conf/Catalina/localhost/ROOT.xml:ro
 
+  oracle:
+    image: container-registry.oracle.com/database/free@sha256:f988b0c04c4c386cd306a2a914c0d7a9702d83acc31b064a28ad8eb6278a8fba
+    container_name: oracle-db
+    restart: unless-stopped
+    network_mode: bridge
+    shm_size: "64m"
+    stop_grace_period: 5m
+    ports:
+      - "127.0.0.1:1521:1521"
+    env_file:
+      - path: ./oracle.env
+        format: raw
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+
+volumes:
+  oracle-data:
+    external: true
+    name: oracle-data

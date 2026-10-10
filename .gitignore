@@ -29,3 +29,5 @@ Thumbs.db
 /app.env
 /app.env.tmp
 /certbot/
+/oracle.env
+/oracle.env.tmp
