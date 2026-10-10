@@ -72,7 +72,7 @@ jobs:
         host: ${{env.SERVER_IP}}
         username: ubuntu
         key: ${{secrets.SERVER_SSH_KEY}}
-        source: "compose.yaml,deploy/nginx/default.conf,deploy/tomcat/ROOT.xml"
+        source: "compose.yaml,deploy/nginx/default.conf,deploy/tomcat/ROOT.xml,deploy/scripts/backup-db.sh,deploy/scripts/renew-cert.sh"
         target: /home/ubuntu/deepstudy-deploy
         overwrite: true      
     

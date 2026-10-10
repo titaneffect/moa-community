@@ -14,6 +14,7 @@
 /tmp/
 
 # Logs
+/logs/
 *.log
 *.dmp
 
@@ -31,3 +32,8 @@ Thumbs.db
 /certbot/
 /oracle.env
 /oracle.env.tmp
+
+# Backup output and runtime files
+/db-backups/
+/backup-db.lock
+/backup-db.sh.before-retention-*
