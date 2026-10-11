@@ -18,6 +18,7 @@
 		<junit-version>5.10.2</junit-version>
 		<org.springframework-security-version>5.8.14</org.springframework-security-version>
 	</properties>
+
 	<dependencies>
 
 		<!-- Spring -->
@@ -120,6 +121,14 @@
 		</dependency>
 
 		<!-- Spring Test -->
+		<!-- MockMvc에서도 Tomcat과 같은 Bean Validation 메시지 처리를 제공한다. -->
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-el</artifactId>
+			<version>9.0.122</version>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
@@ -205,9 +214,20 @@
 		    <artifactId>tiles-jsp</artifactId>
 		    <version>3.0.8</version>
 		</dependency>
+
 	</dependencies>
+
 	<build>
 		<plugins>
+			<!-- Java 8에서 JUnit 5 테스트를 실제로 실행한다. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.2.5</version>
+				<configuration>
+					<failIfNoTests>true</failIfNoTests>
+				</configuration>
+			</plugin>
 			<plugin>
 				<artifactId>maven-eclipse-plugin</artifactId>
 				<version>2.9</version>

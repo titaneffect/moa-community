@@ -8,7 +8,7 @@ Spring MVC 기반 커뮤니티 서비스입니다.
 - 서비스 주소: https://moducafe.duckdns.org/
 - 학습 및 개인 프로젝트로 운영하며, EC2 실행 상태에 따라 접속이 제한될 수 있습니다.
 
-[운영 가이드](docs/operations.md) · [복구 가이드](docs/recovery.md)
+[운영 가이드](docs/operations.md) · [복구 가이드](docs/recovery.md) · [테스트 가이드](docs/testing.md)
 
 ## 1. 프로젝트 목표
 
@@ -261,10 +261,10 @@ db.url=jdbc:oracle:thin:@127.0.0.1:1522/FREEPDB1
 배포 워크플로와 같은 방식으로 WAR를 생성합니다.
 
 ```bash
-mvn clean package -DskipTests
+mvn clean package
 ```
 
-이 명령은 테스트 실행을 생략합니다.
+이 명령은 테스트를 실행한 뒤 WAR를 생성합니다.
 
 생성된 WAR를 Tomcat 9에 배포하거나 STS의 Tomcat 서버에서 실행합니다.
 기본 경로 `/`에 접속하면 카페 목록 `/cafe`로 이동합니다.
@@ -307,7 +307,7 @@ Docker Compose로 다음 컨테이너를 관리합니다.
 
 1. 소스 체크아웃과 Java 8 환경 준비
 2. 배포용 DB·업로드 설정 생성
-3. Maven으로 WAR 빌드 — 테스트 실행 생략
+3. Maven으로 테스트 실행 및 WAR 빌드
 4. Docker 이미지 빌드 및 Docker Hub 업로드
 5. Compose, Nginx·Tomcat 설정, 운영 스크립트를 EC2로 복사
 6. Nginx 설정 검사와 앱 이미지 갱신
@@ -382,8 +382,11 @@ DB 덤프에는 첨부파일 메타데이터가 포함되지만,
 - 첨부파일 백업: 16:10 예약 실행 및 완료 로그 확인
 - 인증서 확인: 16:00 예약 실행, 갱신 대상 없음 및 Nginx 설정 검사·reload 확인
 
-테스트 코드는 저장소에 포함되어 있습니다.
-현재 배포 워크플로는 테스트를 자동 실행하지 않습니다.
+핵심 자동 테스트는 Java 8에서 46개 케이스 통과를 확인했습니다.
+실행 방법과 검증 범위는 [테스트 가이드](docs/testing.md)를 참고합니다.
+
+GitHub Actions는 WAR 빌드 전에 테스트를 실행하며,
+테스트가 실패하면 이미지 업로드와 배포를 진행하지 않습니다.
 
 ## 11. 향후 계획
 
@@ -400,3 +403,4 @@ DB 덤프에는 첨부파일 메타데이터가 포함되지만,
 
 - [운영 가이드](docs/operations.md): 배포, 환경 설정, 예약 작업, 로그 확인
 - [복구 가이드](docs/recovery.md): 복구 준비와 절차 초안, 추가 검증 항목
+- [테스트 가이드](docs/testing.md): 핵심 테스트 선정 기준, 실행 방법, 검증 범위와 한계

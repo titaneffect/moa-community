@@ -84,7 +84,7 @@ public class MemberControllerTests {
 	}
 
 
-	// @Test
+	@Test
 	void 비밀번호_불일치_오류는_passwordConfirm_필드에_표시한다()
 	        throws Exception {
 	    // given: 서비스가 비밀번호 불일치 예외를 던진다
@@ -103,16 +103,6 @@ public class MemberControllerTests {
 	                "member", "passwordConfirm"));
 
 	    verify(memberService).register(any(MemberDTO.class));
-	}
-
-	@Test
-	void 안전한_returnUrl은_로그인_후_복귀_주소로_저장한다() {
-
-	}
-
-	@Test
-	void 외부_사이트_returnUrl은_복귀_주소로_사용하지_않는다() {
-
 	}
 
 }

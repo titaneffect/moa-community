@@ -43,7 +43,7 @@ jobs:
     
     # 4. Maven으로 WAR 파일 생성
     - name: 메이븐 빌드
-      run: mvn clean package -DskipTests
+      run: mvn clean package
     
     # 5. Docker 이미지 생성
     - name: Build Docker Image
