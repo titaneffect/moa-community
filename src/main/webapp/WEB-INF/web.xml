@@ -51,10 +51,20 @@
 	</filter-mapping>
 
 	<!-- Creates the Spring Container shared by all Servlets and Filters -->
+	<!-- Spring Root ApplicationContext 생성 -->
 	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+		<listener-class>
+			org.springframework.web.context.ContextLoaderListener
+		</listener-class>
 	</listener>
-
+	
+	<!-- Spring Security에 세션 수명 주기 이벤트 전달 -->
+	<listener>	
+		<listener-class>
+        	org.springframework.security.web.session.HttpSessionEventPublisher
+    	</listener-class>
+	</listener>
+	
 	<!-- Processes application requests -->
 	<servlet>
 		<servlet-name>appServlet</servlet-name>

@@ -135,6 +135,14 @@
 			<version>${org.springframework-version}</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- Spring Security 필터를 포함한 로그인 테스트 -->
+		<dependency>
+		    <groupId>org.springframework.security</groupId>
+		    <artifactId>spring-security-test</artifactId>
+		    <version>${org.springframework-security-version}</version>
+		    <scope>test</scope>
+		</dependency>
 
 		<!-- JUnit 5 -->
 		<dependency>

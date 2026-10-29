@@ -224,6 +224,25 @@
         </c:otherwise>
 
     </c:choose>
+    
+    <!-- 세션 만료 안내: JavaScript에서 필요할 때 표시 -->
+	<div id="replySessionNotice"
+	     class="alert alert-warning mt-3"
+	     role="alert"
+	     hidden>
+	
+	    <p class="mb-2">
+	        <strong>로그인이 종료되었습니다.</strong><br>
+		    <small>
+		        페이지를 이동하거나 새로고침하면 입력 내용이 사라질 수 있습니다.
+		    </small>
+	    </p>
+	
+	    <a class="btn btn-sm btn-outline-primary"
+	       href="${pageContext.request.contextPath}/member/login?cafeId=${cafeId}&cafeBoardId=${cafeBoard.cafeBoardId}&bno=${board.bno}">
+	        다시 로그인
+	    </a>
+	</div>
 
     <c:if test="${not empty registerErrors}">
 
@@ -257,21 +276,67 @@
 	
 	const loginUsername = document.querySelector('#replyListArea').dataset.loginUsername;
 	
+	// 한 번 로그인 종료를 확인하면 현재 화면에서는 성공 처리를 중단한다.
+	let replySessionExpired = false;
+
+	class ReplySessionExpiredError extends Error {
+	    constructor() {
+	        super('로그인이 종료되었습니다.');
+	        this.name = 'ReplySessionExpiredError';
+	    }
+	}
+
+	function checkReplySession(response) {
+	    const responseUrl = new URL(response.url, window.location.href);
+
+	    const redirectedToLogin =
+	        response.redirected
+	        && responseUrl.origin === window.location.origin
+	        && responseUrl.pathname === contextPath + '/member/login';
+
+	    if (redirectedToLogin || response.status === 401) {
+	        replySessionExpired = true;
+	    }
+
+	    if (replySessionExpired) {
+	        const notice = document.querySelector('#replySessionNotice');
+	        notice.hidden = false;
+
+	        // 단순 return으로 끝내면 다음 then이 실행되므로 예외로 중단한다.
+	        throw new ReplySessionExpiredError();
+	    }
+	}
+
+	function handleReplyError(error) {
+	    if (error instanceof ReplySessionExpiredError) {
+	        // 안내 영역에서 이미 설명하므로 alert는 띄우지 않는다.
+	        return;
+	    }
+
+	    console.error(error);
+	    alert(error.message || '댓글 요청 처리 중 오류가 발생했습니다.');
+	}
+	
 	function loadReplies(){
 		fetch(contextPath + '/api/replies?bno=' + bno)
 		.then(response => {
+			checkReplySession(response);
+			
 			if(!response.ok){
 				throw new Error('댓글 조회 실패');
 			}
+			
 			return response.json();
 		})
 		.then(replyList => {
-			console.log(replyList);
-			renderReplies(replyList);
+		    if (replySessionExpired) {
+		        return;
+		    }
+		
+		    console.log(replyList);
+		    renderReplies(replyList);
 		})
-		.catch(error => {
-			console.error(error);
-		});
+		.catch(handleReplyError);
 	}
 	
 	function formatReplyDate(value){
@@ -441,6 +506,8 @@
 				})
 			})
 			.then(response => {
+				checkReplySession(response);
+				
 				if(!response.ok){
 					return createApiError(
 						response,
@@ -451,15 +518,15 @@
 				return response.text();
 			})
 			.then(result => {
-				console.log(result);
-				replyInput.value = '';
-				
-				loadReplies();
+			    if (replySessionExpired) {
+			        return;
+			    }
+			
+			    console.log(result);
+			    replyInput.value = '';
+			    loadReplies();
 			})
-			.catch(error => {
-				console.log(error);
-				alert(error.message);
-			});
+			.catch(handleReplyError);
 		}
 	);
 	}
@@ -489,6 +556,8 @@
 			}
 		)
 		.then(response => {
+			checkReplySession(response);
+			
 			if(!response.ok){
 				return createApiError(
 				response,
@@ -496,11 +565,14 @@
 				);
 			}
 		})
-		.then(() => {loadReplies();})
-		.catch(error => {
-			console.error(error);
-			alert(error.message);
-		});
+		.then(() => {
+		    if (replySessionExpired) {
+		        return;
+		    }
+		
+		    loadReplies();
+		})
+		.catch(handleReplyError);
 	}
 	
 	function deleteReply(rno){
@@ -521,6 +593,8 @@
 			}
 		)
 		.then(response => {
+			checkReplySession(response);
+			
 			if(!response.ok){
 				return createApiError(
 					response,
@@ -529,25 +603,31 @@
 			}	
 		})
 		.then(() => {
-			loadReplies();
+		    if (replySessionExpired) {
+		        return;
+		    }
+		
+		    loadReplies();
 		})
-		.catch(error => {
-			console.error(error);
-			alert(error.message);
-		});
+		.catch(handleReplyError);
 	}
 	
-	function createApiError(response, defaultMessage){
-		return response.json()
-			.then(errorBody => {
-				let message = errorBody.message;
-				
-				if(errorBody.errors && errorBody.errors.reply){
-					message = errorBody.errors.reply;
-				}
-				
-				throw new Error(message || defaultMessage);
-			});
+	async function createApiError(response, defaultMessage) {
+	    let errorBody = null;
+
+	    try {
+	        errorBody = await response.json();
+	    } catch (parseError) {
+	        // HTML 또는 빈 응답이면 아래의 기본 메시지를 사용한다.
+	    }
+
+	    const message = errorBody
+	        && (
+	            (errorBody.errors && errorBody.errors.reply)
+	            || errorBody.message
+	        );
+
+	    throw new Error(message || defaultMessage);
 	}
 	
 	loadReplies();

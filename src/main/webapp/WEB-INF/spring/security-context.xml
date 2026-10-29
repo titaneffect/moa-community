@@ -48,6 +48,14 @@
 		
 		<access-denied-handler error-page="/WEB-INF/views/error/exception.jsp" />
 		<logout logout-success-url="/member/login?logout"/>
+		
+		<!-- 계정당 로그인 세션 1개 허용: 새 로그인 시 기존 세션 만료 -->
+		<session-management>
+		    <concurrency-control
+		        max-sessions="1"
+		        error-if-maximum-exceeded="false"
+		        expired-url="/member/login?expired" />
+		</session-management>
 	</http>
 
 	<beans:bean id="passwordEncoder"

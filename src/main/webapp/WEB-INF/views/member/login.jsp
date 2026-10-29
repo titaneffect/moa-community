@@ -61,6 +61,15 @@
                 </div>
 
             </c:if>
+            
+            <!-- 다른 곳에서 로그인하여 기존 세션이 만료된 경우 -->
+			<c:if test="${param.expired != null}">
+			    <div class="alert alert-warning"
+			         role="alert">
+			        다른 곳에서 같은 계정으로 로그인하여
+			        현재 로그인이 종료되었습니다.
+			    </div>
+			</c:if>
 
             <form method="post"
                   action="${pageContext.request.contextPath}/login">

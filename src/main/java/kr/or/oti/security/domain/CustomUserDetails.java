@@ -1,6 +1,7 @@
 package kr.or.oti.security.domain;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -55,5 +56,25 @@ public class CustomUserDetails implements UserDetails {
 	@Override
 	public boolean isEnabled() {
 		return memberVO.isEnabled();
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+	    if (this == obj) {
+	        return true;
+	    }
+
+	    if (obj == null || getClass() != obj.getClass()) {
+	        return false;
+	    }
+
+	    CustomUserDetails other = (CustomUserDetails) obj;
+
+	    return Objects.equals(getUsername(), other.getUsername());
+	}
+
+	@Override
+	public int hashCode() {
+	    return Objects.hashCode(getUsername());
 	}
 }
