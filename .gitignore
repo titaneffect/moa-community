@@ -37,3 +37,7 @@ Thumbs.db
 /db-backups/
 /backup-db.lock
 /backup-db.sh.before-retention-*
+
+# Python backup tooling
+__pycache__/
+*.pyc

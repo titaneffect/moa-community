@@ -1,5 +1,8 @@
 # 운영 가이드
 
+> 2026-11-08: S3 덤프 7세트와 주간 RMAN 전체 백업 2묶음 보관 설정을 EC2에 적용했습니다.
+> 스크립트·검증·IAM 권한·정리 재개 방법은 [백업 보관 제한](backup-retention.md)을 참고합니다.
+
 ## 1. 운영 환경
 
 | 항목 | 설정 |
@@ -86,6 +89,7 @@ docker compose logs --tail=100 app
 | 인증서 갱신 확인 | 매일 10:00, 16:00 | ubuntu |
 | DB 백업 | 매일 16:00 | ubuntu |
 | 첨부파일 백업 | 매일 16:10 | root |
+| RMAN 전체 백업·검증·S3 보관·정리 | 매주 일요일 17:00 | root |
 
 EC2가 꺼져 있으면 예약 작업은 실행되지 않습니다.
 
@@ -102,13 +106,14 @@ sudo crontab -l
 
 ```cron
 0 10,16 * * * /bin/bash /home/ubuntu/deepstudy-deploy/deploy/scripts/renew-cert.sh >> /home/ubuntu/deepstudy-deploy/logs/renew-cert.log 2>&1
-0 16 * * * /bin/bash /home/ubuntu/deepstudy-deploy/deploy/scripts/backup-db.sh >> /home/ubuntu/deepstudy-deploy/logs/backup-db.log 2>&1
+0 16 * * * BACKUP_PRUNE=1 /bin/bash /home/ubuntu/deepstudy-deploy/deploy/scripts/backup-db.sh >> /home/ubuntu/deepstudy-deploy/logs/backup-db.log 2>&1
 ```
 
 ### root의 cron
 
 ```cron
 10 16 * * * /bin/bash /home/ubuntu/deepstudy-deploy/deploy/scripts/backup-attachments.sh >> /home/ubuntu/deepstudy-deploy/logs/backup-attachments.log 2>&1
+0 17 * * 0 BACKUP_PRUNE=1 /bin/bash /home/ubuntu/deepstudy-deploy/deploy/scripts/backup-rman.sh >> /home/ubuntu/deepstudy-deploy/logs/backup-rman.log 2>&1
 ```
 
 `>>`는 로그를 이어 쓰고, `2>&1`은 오류도 같은 로그에 기록합니다.
@@ -150,9 +155,9 @@ bash /home/ubuntu/deepstudy-deploy/deploy/scripts/backup-db.sh
 ```
 
 새 덤프·로그를 생성하고 S3에 업로드합니다.
-정상 완료된 백업은 최근 7세트를 유지하며,
-정리 대상의 호스트·컨테이너 사본을 삭제합니다.
-S3 사본은 이 스크립트에서 삭제하지 않습니다.
+예약 실행은 `BACKUP_PRUNE=1`로 정상 완료된 백업 최근 7세트를 유지하며,
+정리 대상의 호스트·컨테이너·S3 사본을 삭제합니다.
+위 수동 명령은 기본값 `BACKUP_PRUNE=0`이므로 새 백업과 S3 업로드 후 삭제 예정 목록만 출력합니다.
 
 ### 첨부파일 백업
 
@@ -181,7 +186,9 @@ Nginx 설정 검사 후 reload합니다.
 | 첨부파일 | deepstudy-attachment-backups-406579089357-ap-northeast-2-an / attachments/ |
 
 EC2는 IAM 역할로 S3에 접근합니다.
-현재 두 버킷에는 자동 삭제 규칙을 설정하지 않았습니다.
+두 버킷에는 S3 Lifecycle 자동 삭제 규칙을 설정하지 않았습니다.
+DB 버킷은 스크립트가 성공한 덤프 최근 7세트와 관리 RMAN 전체 백업 최근 2묶음을 유지합니다.
+첨부파일 버킷은 기존 보관 방식을 유지합니다.
 
 DB 백업은 실행마다 별도의 덤프·로그를 생성합니다.
 첨부파일 백업은 같은 경로에 변경 내용을 반영하며,

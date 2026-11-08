@@ -1,0 +1,21 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadBackupBucketVersioning",
+      "Effect": "Allow",
+      "Action": "s3:GetBucketVersioning",
+      "Resource": "arn:aws:s3:::deepstudy-db-backups-406579089357-ap-northeast-2-an"
+    },
+    {
+      "Sid": "DeleteOldDatabaseBackups",
+      "Effect": "Allow",
+      "Action": "s3:DeleteObject",
+      "Resource": [
+        "arn:aws:s3:::deepstudy-db-backups-406579089357-ap-northeast-2-an/db-backups/scott-*.dmp",
+        "arn:aws:s3:::deepstudy-db-backups-406579089357-ap-northeast-2-an/db-backups/scott-*.log",
+        "arn:aws:s3:::deepstudy-db-backups-406579089357-ap-northeast-2-an/db-backups/rman-managed/FREE/*"
+      ]
+    }
+  ]
+}

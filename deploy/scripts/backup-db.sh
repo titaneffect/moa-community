@@ -37,6 +37,10 @@ docker cp "oracle-db:${backup_dir}/${backup_name}.dmp" db-backups/
 docker cp "oracle-db:${backup_dir}/${backup_name}.log" db-backups/
 chmod 600 "db-backups/${backup_name}.dmp" "db-backups/${backup_name}.log"
 
+# expdp의 종료 코드뿐 아니라 새 덤프와 정상 완료 기록도 확인합니다.
+test -s "db-backups/${backup_name}.dmp"
+grep -Eq '^Job .* successfully completed' "db-backups/${backup_name}.log"
+
 # 새 백업의 덤프와 로그를 S3에도 보관
 s3_dest="s3://deepstudy-db-backups-406579089357-ap-northeast-2-an/db-backups"
 
@@ -54,8 +58,16 @@ echo "S3 백업 업로드 완료: ${backup_name}"
 
 # 성공한 백업만 최근 7세트 보관
 # 0: 삭제 예정 목록만 출력, 1: 실제 삭제
-BACKUP_PRUNE=${BACKUP_PRUNE:-1}
+BACKUP_PRUNE=${BACKUP_PRUNE:-0}
+[[ "$BACKUP_PRUNE" == "0" || "$BACKUP_PRUNE" == "1" ]]
 keep_count=7
+
+# S3 정리가 실패하면 로컬 정리도 진행하지 않습니다.
+prune_args=()
+if [[ "$BACKUP_PRUNE" == "1" ]]; then
+  prune_args+=(--apply)
+fi
+python3 deploy/scripts/backup-store.py prune-dumps "${prune_args[@]}"
 
 # 날짜가 포함된 파일 이름을 일정한 순서로 정렬
 export LC_ALL=C

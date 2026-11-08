@@ -72,7 +72,7 @@ jobs:
         host: ${{env.SERVER_IP}}
         username: ubuntu
         key: ${{secrets.SERVER_SSH_KEY}}
-        source: "compose.yaml,deploy/nginx/default.conf,deploy/tomcat/ROOT.xml,deploy/scripts/backup-db.sh,deploy/scripts/renew-cert.sh,deploy/scripts/backup-attachments.sh"
+        source: "compose.yaml,deploy/nginx/default.conf,deploy/tomcat/ROOT.xml,deploy/scripts/backup-db.sh,deploy/scripts/backup-rman.sh,deploy/scripts/backup-store.py,deploy/scripts/renew-cert.sh,deploy/scripts/backup-attachments.sh"
         target: /home/ubuntu/deepstudy-deploy
         overwrite: true      
     
@@ -153,4 +153,3 @@ jobs:
           
           echo "배포 확인 실패: /cafe 정상 응답 없음"
           exit 1
-          
